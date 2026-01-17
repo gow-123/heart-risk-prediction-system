@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result | Heart Disease Assessment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff6b6b, #c92a2a);
+            --success-gradient: linear-gradient(135deg, #51cf66, #2f9e44);
+            --text-primary: #333;
+            --text-secondary: #777;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+        
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .result-container {
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            color: white;
+        }
+
+        .result-header.high-risk {
+            background: var(--primary-gradient);
+        }
+
+        .result-header.low-risk {
+            background: var(--success-gradient);
+        }
+
+        .result-header::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+        }
+
+        .result-icon-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: pulse 2s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .result-icon i {
+            font-size: 4rem;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-body {
+            padding: 2.5rem;
+        }
+
+        .result-status {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge.high-risk {
+            background: rgba(255, 107, 107, 0.1);
+            color: #c92a2a;
+        }
+
+        .status-badge.low-risk {
+            background: rgba(81, 207, 102, 0.1);
+            color: #2f9e44;
+        }
+
+        .probability-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .probability-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .probability-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .probability-value.high-risk {
+            color: #c92a2a;
+        }
+
+        .probability-value.low-risk {
+            color: #2f9e44;
+        }
+
+        .probability-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .probability-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+
+        .probability-fill.high-risk {
+            background: linear-gradient(90deg, #ff6b6b, #c92a2a);
+        }
+
+        .probability-fill.low-risk {
+            background: linear-gradient(90deg, #51cf66, #2f9e44);
+        }
+
+        .recommendations {
+            background: rgba(255, 107, 107, 0.05);
+            border-left: 4px solid;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .recommendations.high-risk {
+            border-color: #c92a2a;
+        }
+
+        .recommendations.low-risk {
+            border-color: #2f9e44;
+            background: rgba(81, 207, 102, 0.05);
+        }
+
+        .recommendations-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            color: var(--text-primary);
+        }
+
+        .recommendations-title i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .recommendations.high-risk .recommendations-title i {
+            color: #c92a2a;
+        }
+
+        .recommendations.low-risk .recommendations-title i {
+            color: #2f9e44;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .recommendation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .recommendation-item i {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .recommendation-item.high-risk i {
+            color: #c92a2a;
+        }
+
+        .recommendation-item.low-risk i {
+            color: #2f9e44;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary-action {
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-primary-action.high-risk {
+            background: var(--primary-gradient);
+        }
+
+        .btn-primary-action.low-risk {
+            background: var(--success-gradient);
+        }
+
+        .btn-primary-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-action {
+            background: #f8f9fa;
+            color: var(--text-secondary);
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary-action:hover {
+            background: #e9ecef;
+            color: var(--text-primary);
+        }
+
+        .disclaimer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f1f3f5;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .disclaimer i {
+            margin-right: 0.5rem;
+            color: #ffd43b;
+        }
+
+        @media (max-width: 768px) {
+            .result-body {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .probability-value {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        {% if prediction == 1 %}
+        <!-- HIGH RISK RESULT -->
+        <div class="result-card">
+            <div class="result-header high-risk">
+                <div class="result-icon-container">
+                    <div class="result-icon">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                    </div>
+                    <h1 class="result-title">High Risk Detected</h1>
+                    <p class="result-subtitle">Immediate medical attention recommended</p>
+                </div>
+            </div>
+
+            <div class="result-body">
+                <div class="result-status">
+                    <div class="status-badge high-risk">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>High Risk
+                    </div>
+                </div>
+
+                <div class="probability-section">
+                    <div class="probability-label">Risk Probability</div>
+                    <h2 class="probability-value high-risk">{{ probability }}%</h2>
+                    <div class="probability-bar">
+                        <div class="probability-fill high-risk" style="width: {{ probability }}%"></div>
+                    </div>
+                </div>
+
+                <div class="recommendations high-risk">
+                    <div class="recommendations-title">
+                        <i class="bi bi-clipboard2-pulse-fill"></i>
+                        Urgent Recommendations
+                    </div>
+                    <div class="recommendation-item high-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Schedule an immediate consultation with a cardiologist</span>
+                    </div>
+                    <div class="recommendation-item high-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Begin comprehensive cardiovascular screening tests</span>
+                    </div>
+                    <div class="recommendation-item high-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Implement strict lifestyle modifications under medical supervision</span>
+                    </div>
+                    <div class="recommendation-item high-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Monitor blood pressure, cholesterol, and glucose levels regularly</span>
+                    </div>
+                    <div class="recommendation-item high-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Discuss medication options with your healthcare provider</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/patient_form" class="btn btn-primary-action high-risk">
+                        <i class="bi bi-arrow-repeat me-2"></i>Check Another Patient
+                    </a>
+                    <a href="/dashboard" class="btn btn-secondary-action">
+                        <i class="bi bi-house-door me-2"></i>Dashboard
+                    </a>
+                </div>
+
+                <div class="disclaimer">
+                    <i class="bi bi-info-circle-fill"></i>
+                    This is an AI-based prediction and should not replace professional medical advice. Please consult with a qualified healthcare provider for proper diagnosis and treatment.
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- LOW RISK RESULT -->
+        <div class="result-card">
+            <div class="result-header low-risk">
+                <div class="result-icon-container">
+                    <div class="result-icon">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <h1 class="result-title">Low Risk Detected</h1>
+                    <p class="result-subtitle">Great news! Your heart health looks good</p>
+                </div>
+            </div>
+
+            <div class="result-body">
+                <div class="result-status">
+                    <div class="status-badge low-risk">
+                        <i class="bi bi-check-circle-fill me-2"></i>Low Risk
+                    </div>
+                </div>
+
+                <div class="probability-section">
+                    <div class="probability-label">Risk Probability</div>
+                    <h2 class="probability-value low-risk">{{ probability }}%</h2>
+                    <div class="probability-bar">
+                        <div class="probability-fill low-risk" style="width: {{ probability }}%"></div>
+                    </div>
+                </div>
+
+                <div class="recommendations low-risk">
+                    <div class="recommendations-title">
+                        <i class="bi bi-clipboard2-heart-fill"></i>
+                        Recommendations to Stay Healthy
+                    </div>
+                    <div class="recommendation-item low-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Maintain regular physical activity (150 minutes of moderate exercise weekly)</span>
+                    </div>
+                    <div class="recommendation-item low-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Follow a balanced, heart-healthy diet rich in fruits and vegetables</span>
+                    </div>
+                    <div class="recommendation-item low-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Schedule annual health checkups for preventive care</span>
+                    </div>
+                    <div class="recommendation-item low-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Manage stress through relaxation techniques and adequate sleep</span>
+                    </div>
+                    <div class="recommendation-item low-risk">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Avoid smoking and limit alcohol consumption</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/patient_form" class="btn btn-primary-action low-risk">
+                        <i class="bi bi-arrow-repeat me-2"></i>Check Another Patient
+                    </a>
+                    <a href="/dashboard" class="btn btn-secondary-action">
+                        <i class="bi bi-house-door me-2"></i>Dashboard
+                    </a>
+                </div>
+
+                <div class="disclaimer">
+                    <i class="bi bi-info-circle-fill"></i>
+                    This is an AI-based prediction and should not replace professional medical advice. Continue regular health monitoring and consult healthcare professionals as needed.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate probability bar on load
+        window.addEventListener('load', function() {
+            const fill = document.querySelector('.probability-fill');
+            if (fill) {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
