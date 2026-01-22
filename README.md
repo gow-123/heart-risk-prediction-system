@@ -1,4 +1,4 @@
-❤️ Heart Risk Prediction System
+**** Heart Risk Prediction System****
 
 A full-stack **Machine Learning web application** that predicts the **risk of heart disease** based on patient health data.  
 This project demonstrates an **end-to-end ML workflow** — from model prediction to deployment with a user-friendly UI.
