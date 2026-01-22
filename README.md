@@ -1,4 +1,4 @@
-**** Heart Risk Prediction System****
+Heart Risk Prediction System
 
 A full-stack **Machine Learning web application** that predicts the **risk of heart disease** based on patient health data.  
 This project demonstrates an **end-to-end ML workflow** — from model prediction to deployment with a user-friendly UI.
@@ -17,13 +17,13 @@ The system includes authentication, a dashboard-style UI, patient data entry, an
 
 ---
 
-🧠 Features
+Features
 
-- 🔐 User Login & Registration  
-- 📝 Patient health data input form  
-- 🤖 ML-based heart disease prediction  
-- 🟥 High Risk / 🟩 Low Risk result  
-- 🌐 Deployed using Render  
+- User Login & Registration  
+- Patient health data input form  
+- ML-based heart disease prediction  
+- High Risk / 🟩 Low Risk result  
+- Deployed using Render  
 
 ---
 
@@ -36,5 +36,10 @@ The system includes authentication, a dashboard-style UI, patient data entry, an
 
 ---
 
-📂 Project Structure
+Author
+
+Gowrilekshmi J
+Data Scientist
+
+🔗 LinkedIn: https://linkedin.com/in/your-profile
 
